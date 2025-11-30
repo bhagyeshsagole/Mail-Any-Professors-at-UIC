@@ -1,7 +1,6 @@
 # UIC Mail Agent
 
 Draft polished emails to University of Illinois Chicago faculty with a single prompt. The agent can look up official `uic.edu` addresses, generate a professional email that always ends with your signature, and open it in your default mail client so you can review and send it yourself. An optional automated mode is included if you want the script to send the email through SMTP after you approve it.
-[![Watch the video](https://img.youtube.com/vi/5Hhbuk2VwBc/hqdefault.jpg)](https://youtu.be/5Hhbuk2VwBc)
 
 ## Features
 - Interactive CLI that accepts either a professor's email or a natural-language description (course, department, name) and performs a web search to locate the correct address.
@@ -82,3 +81,6 @@ The automated flow still asks you to review each draft and confirm before sendin
 - Remember not to commit your real `.env`. Ship `.env.example` so your friends can copy it.
 - The Makefile / `.command` script only touches files inside the repo, so the project stays portable.
 - If someone hits dependency issues, deleting `.venv` and rerunning `make setup` will recreate the virtual environment with a clean install.
+
+## Video
+[![Watch the video](https://img.youtube.com/vi/5Hhbuk2VwBc/hqdefault.jpg)](https://youtu.be/5Hhbuk2VwBc)
