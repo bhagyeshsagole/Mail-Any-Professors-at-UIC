@@ -1,72 +1,71 @@
-# UIC Mail Agent
+# UIC Mail Agent: A Build Log
 
-Draft polished emails to University of Illinois Chicago faculty with a single prompt. The agent can look up official `uic.edu` addresses, generate a professional email that always ends with your signature, and open it in your default mail client so you can review and send it yourself. An optional automated mode is included if you want the script to send the email through SMTP after you approve it.
+I wrote the **UIC Mail Agent** after too many late nights hunting for the right University of Illinois Chicago professor and agonizing over polite wording. This README doubles as a blog post: it tells the story of how I stand up the agent on any computer and the exact steps I follow from blank folder to first email.
 
-## Features
-- Interactive CLI that accepts either a professor's email or a natural-language description (course, department, name) and performs a web search to locate the correct address.
-- GPT-generated drafts that follow a consistent tone, enforce the closing signature, and never leave `[Your Name]` placeholders behind.
-- `mailto:` launcher that pops the draft into your preferred email client for final edits and sending.
-- Optional `mail_agent_auto.py` workflow that can deliver the message through your SMTP account once you've configured an app password.
+## Step 0 – Picture the goal
+Before touching code, I reminded myself what success looks like:
+- Type a clue like "CS 211 Monday lecture" or provide a direct `uic.edu` address.
+- Let the agent confirm the right faculty contact, draft a respectful message in my voice, and make sure my signature is already attached.
+- Choose whether the draft opens in my default mail client (`mailto:` link) or send it automatically after I approve it.
 
-## Requirements
-- Python 3.10+ (tested on macOS and Linux; Windows works via the manual commands below).
-- OpenAI API key with access to `gpt-4o` or compatible Responses API models.
-- `make` (installed by default on macOS/Linux; Windows users can skip it and run the equivalent Python commands).
-- For the automated sender: SMTP credentials (e.g., Gmail address + app password).
+## Step 1 – Gather the toolkit
+I make sure the basics are installed so nothing surprises me mid-setup:
+- Python 3.10 or newer (macOS and Linux by default, Windows via PowerShell).
+- An OpenAI API key that can reach `gpt-4o` or another Responses API model.
+- `make` (optional but speeds up bootstrapping).
+- SMTP credentials (email + app password) only if I expect to use the automatic sender.
 
-## Setup
-1. **Clone & enter the project**
-   ```bash
-   git clone https://github.com/your-org/mail-agent.git
-   cd mail-agent
-   ```
-2. **Create your environment file**
-   ```bash
-   cp .env.example .env
-   ```
-   Edit `.env` and fill in:
-   - `OPENAI_API_KEY` – your OpenAI key.
-   - `EMAIL_ADDRESS` – the UIC email that appears in the draft footer.
-   - (Optional) `EMAIL_APP_PASSWORD` and SMTP settings if you plan to use the automated sender.
-3. **Install dependencies**
-   - Recommended (POSIX): `make setup`
-   - Manual alternative:
-     ```bash
-     python3 -m venv .venv
-     . .venv/bin/activate
-     pip install -r requirements.txt
-     ```
-   - Windows PowerShell:
-     ```powershell
-     py -3 -m venv .venv
-     .\.venv\Scripts\Activate.ps1
-     pip install -r requirements.txt
-     ```
+## Step 2 – Clone the repo
+```bash
+git clone https://github.com/your-org/mail-agent.git
+cd mail-agent
+```
+Everything in this story happens from inside that folder.
 
-## Running the interactive agent
-- **From the terminal (any OS)**
-  ```bash
-  make mail
-  ```
-  or (if you skipped `make`):
-  ```bash
-  . .venv/bin/activate   # On Windows: .\.venv\Scripts\activate
-  python mail_agent.py
-  ```
-- **macOS double-click launcher**
-  - Double-click `MailAgent.command`. On the first run it will bootstrap the virtual environment automatically, then start the CLI.
+## Step 3 – Teach the agent who I am
+The environment template ships with the repo. I copy and customize it so the agent knows my identity:
+```bash
+cp .env.example .env
+```
+Inside `.env` I fill out:
+- `OPENAI_API_KEY` so GPT can draft messages.
+- `EMAIL_ADDRESS` so the closing signature matches my inbox.
+- Optional SMTP fields (`EMAIL_APP_PASSWORD`, host, port) in case I want automated delivery later.
 
-During the session you can type either:
-- A full email address (`professor@uic.edu`), or
-- A description such as `Prof Smith, CS 211 instructor`.
+## Step 4 – Install dependencies
+If `make` exists, I let it handle everything:
+```bash
+make setup
+```
+On systems without `make`, I recreate the same steps manually:
+```bash
+python3 -m venv .venv
+. .venv/bin/activate          # Windows: .\.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+```
+Either route leaves a `.venv` directory that isolates Python packages for the agent.
 
-The agent shows the lookup results, drafts the email, and lets you:
-1. Open it in your Mail app (`mailto:` link) to send manually.
-2. Ask for edits and regenerate.
-3. Cancel and start over.
+## Step 5 – Start chatting with professors
+Time to run the interactive helper:
+```bash
+make mail
+```
+When I cannot rely on `make`, I launch it directly:
+```bash
+. .venv/bin/activate   # Windows: .\.venv\Scripts\activate
+python mail_agent.py
+```
+During a session I can paste a full email address or write something like `Professor Ortiz, BioE 310 lab`. The CLI shows the lookup, drafts the message, and keeps iterating until I approve it. One keypress opens the draft in my default mail client.
 
-## Automated sender (optional)
-Once `.env` also contains `EMAIL_APP_PASSWORD` plus any custom SMTP settings, you can let the agent send the email via SMTP after drafting:
+## Step 6 – Mac shortcut for busy mornings
+On macOS I prefer double-clicking when I am running between meetings. I give the launcher execute permissions once:
+```bash
+chmod +x MailAgent.command
+```
+From then on, opening `MailAgent.command` spins up the virtual environment (if missing) and launches the same CLI without touching Terminal.
+
+## Step 7 – Flip on autopilot (optional)
+When I have SMTP credentials ready and want the script to send the message after approval, I run:
 ```bash
 make mail-auto
 ```
@@ -75,12 +74,16 @@ or, without `make`:
 . .venv/bin/activate
 python mail_agent_auto.py
 ```
-The automated flow still asks you to review each draft and confirm before sending.
+The automated mode still pauses so I can read the draft, then hands the message to the SMTP server and prints a status update.
 
-## Keeping it working on other machines
-- Remember not to commit your real `.env`. Ship `.env.example` so your friends can copy it.
-- The Makefile / `.command` script only touches files inside the repo, so the project stays portable.
-- If someone hits dependency issues, deleting `.venv` and rerunning `make setup` will recreate the virtual environment with a clean install.
+## Step 8 – Keep the project tidy
+A few maintenance rituals keep deployments painless:
+- Never commit `.env`; share `.env.example` instead.
+- If dependencies act up, delete `.venv` and rerun `make setup` for a clean slate.
+- The Makefile and `.command` script only touch files inside the repo, so syncing the folder between machines is safe.
+
+## Step 9 – Experiment and share
+Once the workflow works, I try new prompts, switch SMTP providers, or tweak the drafting tone. Every iteration returns to the same checklist above, so this README remains both a setup manual and a narrative of how the UIC Mail Agent keeps my outreach fast and courteous.
 
 ## Video
 [![Watch the video](https://img.youtube.com/vi/5Hhbuk2VwBc/hqdefault.jpg)](https://youtu.be/5Hhbuk2VwBc)
