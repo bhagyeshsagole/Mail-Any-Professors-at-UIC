@@ -1,6 +1,7 @@
 # UIC Mail Agent
 
 Draft polished emails to University of Illinois Chicago faculty with a single prompt. The agent can look up official `uic.edu` addresses, generate a professional email that always ends with your signature, and open it in your default mail client so you can review and send it yourself. An optional automated mode is included if you want the script to send the email through SMTP after you approve it.
+[![Watch the video](https://img.youtube.com/vi/5Hhbuk2VwBc/hqdefault.jpg)](https://youtu.be/5Hhbuk2VwBc)
 
 ## Features
 - Interactive CLI that accepts either a professor's email or a natural-language description (course, department, name) and performs a web search to locate the correct address.
